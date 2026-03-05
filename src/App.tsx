@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Camera, Droplets, Instagram, Mail, Phone, Send, User, ShoppingCart, ArrowLeft, Plus, Minus, Trash2, CheckCircle2, CreditCard, LayoutDashboard, LogOut, Settings, Package, MessageSquare, Image as ImageIcon, Eye, X, Save } from 'lucide-react';
+import { Camera, Droplets, Instagram, Mail, Phone, Send, User, ShoppingCart, ArrowLeft, Plus, Minus, Trash2, CheckCircle2, CreditCard, LayoutDashboard, LogOut, Settings, Package, MessageSquare, Image as ImageIcon, Eye, X, Save, Play } from 'lucide-react';
 import { FormEvent, useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePaystackPayment } from 'react-paystack';
@@ -262,23 +262,24 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="min-h-screen bg-luxury-cream text-luxury-black font-sans selection:bg-gold/20">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 py-4 px-4">
+      <header className="sticky top-0 z-50 bg-luxury-cream/80 backdrop-blur-md border-b border-luxury-black/5 py-6 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="cursor-pointer" onClick={() => setView('home')}>
-            <h1 className="text-2xl md:text-3xl font-bold text-emerald-600 tracking-tight">
-              ScentFrame
+          <div className="cursor-pointer group" onClick={() => setView('home')}>
+            <h1 className="text-2xl md:text-3xl font-display font-medium tracking-widest uppercase text-luxury-black transition-colors group-hover:text-gold">
+              Divinegrace
+              <span className="block text-[10px] tracking-[0.4em] font-sans font-light mt-1 opacity-60">Perfumes & Cinema</span>
             </h1>
           </div>
           
           <button 
             onClick={() => setView('cart')}
-            className="relative p-2 text-gray-600 hover:text-emerald-600 transition-colors"
+            className="relative p-2 text-luxury-black hover:text-gold transition-all duration-300"
           >
-            <ShoppingCart size={24} />
+            <ShoppingCart size={20} strokeWidth={1.5} />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+              <span className="absolute -top-1 -right-1 bg-gold text-white text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full">
                 {cartCount}
               </span>
             )}
@@ -295,146 +296,155 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             className="max-w-7xl mx-auto px-4 py-12"
           >
-            <div className="text-center mb-16">
-              <p className="text-gray-600 text-lg">Perfumes & Cinematography by Michael</p>
+            <div className="text-center mb-24 mt-12">
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-5xl md:text-7xl font-display italic font-light mb-6"
+              >
+                The Art of Scent & Story
+              </motion.h2>
+              <p className="text-luxury-black/60 text-lg font-light tracking-wide max-w-2xl mx-auto uppercase text-sm">
+                Curated fragrances and cinematic narratives by Michael
+              </p>
+              <div className="w-12 h-[1px] bg-gold mx-auto mt-8 opacity-50"></div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-24">
               {/* Perfumes Section */}
               <section>
-                <div className="flex items-center gap-2 mb-8">
-                  <Droplets className="text-emerald-500" size={28} />
-                  <h2 className="text-2xl font-semibold">Perfumes for Sale</h2>
+                <div className="flex items-center gap-4 mb-12">
+                  <div className="w-12 h-[1px] bg-gold opacity-50"></div>
+                  <h3 className="text-2xl font-display tracking-widest uppercase">The Fragrance Collection</h3>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
                   {perfumes.map((item) => (
-                    <div 
+                    <motion.div 
                       key={item.id} 
+                      whileHover={{ y: -8 }}
                       onClick={() => item.inStock ? addToCart(item) : null}
-                      className={`group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:border-emerald-100 transition-all cursor-pointer ${!item.inStock && 'opacity-60 grayscale'}`}
+                      className={`group relative bg-white border border-luxury-black/5 p-4 transition-all duration-700 cursor-pointer hover:shadow-2xl hover:shadow-gold/5 ${!item.inStock && 'opacity-60'}`}
                     >
-                      <div className="aspect-square bg-gray-100 relative overflow-hidden">
+                      <div className="aspect-[4/5] bg-luxury-cream relative overflow-hidden mb-6">
                         <img 
                           src={item.image} 
                           alt={item.name} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s]"
                           referrerPolicy="no-referrer"
                         />
-                        {item.inStock ? (
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                            <span className="bg-white text-emerald-600 font-bold px-4 py-2 rounded-full shadow-lg">
-                              Add to Cart
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full shadow-lg">
-                              Out of Stock
-                            </span>
+                        {!item.inStock && (
+                          <div className="absolute inset-0 bg-luxury-cream/80 backdrop-blur-[2px] flex items-center justify-center">
+                            <span className="text-[10px] tracking-[0.3em] uppercase font-medium text-luxury-black/60 border border-luxury-black/20 px-4 py-2">Out of Stock</span>
                           </div>
                         )}
+                        {item.inStock && (
+                          <div className="absolute inset-0 bg-luxury-black/0 group-hover:bg-luxury-black/5 transition-colors duration-500"></div>
+                        )}
                       </div>
-                      <div className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-medium text-lg">{item.name}</h3>
-                          <span className={`text-xs font-bold px-2 py-1 rounded-full uppercase ${item.inStock ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                            {item.inStock ? 'In Stock' : 'Out of Stock'}
-                          </span>
+                      <div className="text-center">
+                        <h4 className="font-display text-lg mb-1 group-hover:text-gold transition-colors duration-300">{item.name}</h4>
+                        <p className="text-gold font-light tracking-widest text-sm mb-4">{item.price}</p>
+                        <div className="w-full py-3 text-[10px] tracking-[0.3em] uppercase transition-all duration-500 border border-luxury-black/10 group-hover:border-luxury-black group-hover:bg-luxury-black group-hover:text-white">
+                          {item.inStock ? 'Add to Collection' : 'Unavailable'}
                         </div>
-                        <p className="text-emerald-600 font-bold text-xl">{item.price}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </section>
 
               {/* Cinematography Section */}
               <section>
-                <div className="flex items-center gap-2 mb-8">
-                  <Camera className="text-emerald-500" size={28} />
-                  <h2 className="text-2xl font-semibold">Cinematography Services</h2>
+                <div className="flex items-center gap-4 mb-12">
+                  <div className="w-12 h-[1px] bg-gold opacity-50"></div>
+                  <h3 className="text-2xl font-display tracking-widest uppercase">Cinematic Narratives</h3>
                 </div>
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-12">
                   {portfolio.map((item) => (
-                    <div 
+                    <motion.div 
                       key={item.id} 
+                      whileHover={{ x: 10 }}
                       onClick={() => handlePortfolioClick(item)}
-                      className="group relative bg-gray-900 rounded-2xl overflow-hidden aspect-video shadow-sm border border-gray-100 cursor-pointer"
+                      className="group relative cursor-pointer border-b border-luxury-black/5 pb-12"
                     >
-                      <img 
-                        src={item.image} 
-                        alt={item.title} 
-                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
+                      <div className="aspect-video bg-luxury-black overflow-hidden mb-6">
+                        <img 
+                          src={item.image} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1.5s] grayscale group-hover:grayscale-0"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div className="flex justify-between items-end">
                         <div>
-                          <p className="text-white font-medium text-lg">{item.title}</p>
-                          <p className="text-emerald-400 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">View Previous Works →</p>
+                          <h4 className="text-2xl font-display italic mb-2 group-hover:text-gold transition-colors duration-300">{item.title}</h4>
+                          <p className="text-luxury-black/40 text-[10px] tracking-[0.2em] uppercase font-medium">View Cinematic Work — 2025</p>
+                        </div>
+                        <div className="w-12 h-12 rounded-full border border-luxury-black/10 flex items-center justify-center group-hover:border-gold group-hover:text-gold transition-all duration-500">
+                          <Play size={14} fill="currentColor" className="ml-1" />
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </section>
             </div>
 
             {/* Contact Form Section */}
-            <section id="contact-section" className="mt-24 max-w-3xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold mb-4">Get in Touch</h2>
-                <p className="text-gray-600">Have a question about our perfumes or want to book a shoot? Send us a message!</p>
+            <section id="contact-section" className="mt-48 max-w-4xl mx-auto mb-24">
+              <div className="text-center mb-20">
+                <h2 className="text-4xl font-display italic mb-4">Inquiries & Bookings</h2>
+                <div className="w-12 h-[1px] bg-gold mx-auto mb-6 opacity-50"></div>
+                <p className="text-luxury-black/50 font-light tracking-wide uppercase text-xs">Let's create something timeless together</p>
               </div>
 
-              <div className="bg-white rounded-3xl shadow-xl shadow-emerald-900/5 p-8 md:p-12 border border-gray-100">
+              <div className="bg-white border border-luxury-black/5 p-8 md:p-20 shadow-2xl shadow-gold/5">
                 {formStatus === 'success' ? (
-                  <div className="py-12 text-center">
-                    <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Send size={40} />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-2">Message Sent!</h3>
-                    <p className="text-gray-600 mb-8">Thank you for reaching out. Michael will get back to you shortly.</p>
+                  <div className="py-20 text-center">
+                    <motion.div 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="w-24 h-24 border border-gold text-gold rounded-full flex items-center justify-center mx-auto mb-8"
+                    >
+                      <Send size={32} strokeWidth={1} />
+                    </motion.div>
+                    <h3 className="text-3xl font-display italic mb-4">Message Received</h3>
+                    <p className="text-luxury-black/50 font-light mb-12">Michael will be in touch with you shortly.</p>
                     <button 
                       onClick={() => setFormStatus('idle')}
-                      className="text-emerald-600 font-semibold hover:underline"
+                      className="text-gold tracking-[0.2em] uppercase text-[10px] font-medium hover:text-luxury-black transition-colors"
                     >
-                      Send another message
+                      Send another inquiry
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                          <User size={16} className="text-emerald-500" />
-                          Full Name
-                        </label>
+                  <form onSubmit={handleSubmit} className="space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                      <div className="space-y-3">
+                        <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Full Name</label>
                         <input 
                           required
                           name="name"
                           type="text" 
-                          placeholder="John Doe"
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                          placeholder="Your Name"
+                          className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light placeholder:text-luxury-black/20"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                          <Mail size={16} className="text-emerald-500" />
-                          Email Address
-                        </label>
+                      <div className="space-y-3">
+                        <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Email Address</label>
                         <input 
                           required
                           name="email"
                           type="email" 
-                          placeholder="john@example.com"
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                          placeholder="your@email.com"
+                          className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light placeholder:text-luxury-black/20"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700">Service Interested In</label>
-                      <select name="service" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all bg-white">
+                    <div className="space-y-3">
+                      <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Service of Interest</label>
+                      <select name="service" className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light bg-white cursor-pointer">
                         <option>Perfumes</option>
                         <option>Cinematography</option>
                         <option>Both</option>
@@ -442,29 +452,26 @@ export default function App() {
                       </select>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-700">Your Message</label>
+                    <div className="space-y-3">
+                      <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Your Message</label>
                       <textarea 
                         required
                         name="message"
                         rows={4}
-                        placeholder="Tell us more about what you're looking for..."
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all resize-none"
+                        placeholder="Tell us about your vision..."
+                        className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light resize-none placeholder:text-luxury-black/20"
                       ></textarea>
                     </div>
 
                     <button 
                       disabled={formStatus === 'submitting'}
                       type="submit"
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                      className="w-full bg-luxury-black text-white py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-gold transition-all duration-500 shadow-xl shadow-luxury-black/10 flex items-center justify-center gap-2"
                     >
                       {formStatus === 'submitting' ? (
-                        <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        <>
-                          <Send size={20} />
-                          Send Message
-                        </>
+                        'Send Message'
                       )}
                     </button>
                   </form>
@@ -477,62 +484,68 @@ export default function App() {
         {view === 'portfolio-detail' && selectedService && (
           <motion.main 
             key="portfolio-detail"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="max-w-5xl mx-auto px-4 py-12"
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="max-w-7xl mx-auto px-6 py-24"
           >
             <button 
               onClick={() => setView('home')}
-              className="flex items-center gap-2 text-gray-600 hover:text-emerald-600 mb-8 transition-colors font-medium"
+              className="flex items-center gap-2 text-luxury-black/40 hover:text-gold mb-16 transition-colors text-[10px] tracking-[0.2em] uppercase font-medium"
             >
-              <ArrowLeft size={20} />
-              Back to Services
+              <ArrowLeft size={16} />
+              Return to Gallery
             </button>
 
-            <div className="mb-12">
-              <h2 className="text-4xl font-bold mb-4">{selectedService.title}</h2>
-              <p className="text-gray-600 text-lg max-w-2xl">{selectedService.description}</p>
+            <div className="mb-24">
+              <h2 className="text-5xl md:text-7xl font-display italic mb-8">{selectedService.title}</h2>
+              <div className="w-12 h-[1px] bg-gold mb-8 opacity-50"></div>
+              <p className="text-luxury-black/60 text-lg font-light max-w-3xl leading-relaxed">{selectedService.description}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               {selectedService.works.map((work) => (
-                <div key={work.id} className="group bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
-                  <div className="aspect-video relative overflow-hidden">
+                <div key={work.id} className="group">
+                  <div className="aspect-video relative overflow-hidden bg-luxury-black mb-8">
                     <img 
                       src={work.image} 
                       alt={work.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s] grayscale group-hover:grayscale-0"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-600 shadow-sm">
+                    <div className="absolute top-6 right-6">
+                      <span className="bg-luxury-cream/90 backdrop-blur px-4 py-2 text-[9px] font-bold uppercase tracking-[0.2em] text-luxury-black shadow-sm">
                         {work.type}
                       </span>
                     </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">{work.title}</h3>
-                    <p className="text-gray-500 text-sm">Cinematography by Michael</p>
+                  <div>
+                    <h3 className="text-2xl font-display italic mb-2">{work.title}</h3>
+                    <p className="text-luxury-black/40 text-[10px] tracking-[0.2em] uppercase font-medium">Cinematography by Michael</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-16 bg-emerald-600 rounded-3xl p-8 md:p-12 text-center text-white">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">Ready to book your shoot?</h3>
-              <p className="text-emerald-50 mb-8 max-w-xl mx-auto">Let's create something amazing together. Contact us today to discuss your project.</p>
-              <button 
-                onClick={() => {
-                  setView('home');
-                  setTimeout(() => {
-                    document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }}
-                className="bg-white text-emerald-600 px-8 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition-transform"
-              >
-                Get a Quote
-              </button>
+            <div className="mt-32 bg-luxury-black p-12 md:p-24 text-center text-white relative overflow-hidden">
+              <div className="relative z-10">
+                <h3 className="text-4xl md:text-6xl font-display italic mb-8">Capture Your Moment</h3>
+                <p className="text-white/60 mb-12 max-w-xl mx-auto font-light leading-relaxed">Let's translate your vision into a cinematic masterpiece. Contact us today to discuss your project.</p>
+                <button 
+                  onClick={() => {
+                    setView('home');
+                    setTimeout(() => {
+                      document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="bg-gold text-white px-12 py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-white hover:text-luxury-black transition-all duration-500"
+                >
+                  Request a Consultation
+                </button>
+              </div>
+              <div className="absolute inset-0 opacity-10 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-br from-gold to-transparent"></div>
+              </div>
             </div>
           </motion.main>
         )}
@@ -543,81 +556,83 @@ export default function App() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="max-w-3xl mx-auto px-4 py-12"
+            className="max-w-3xl mx-auto px-6 py-24"
           >
             <button 
               onClick={() => setView('home')}
-              className="flex items-center gap-2 text-gray-600 hover:text-emerald-600 mb-8 transition-colors font-medium"
+              className="flex items-center gap-2 text-luxury-black/40 hover:text-gold mb-16 transition-colors text-[10px] tracking-[0.2em] uppercase font-medium"
             >
-              <ArrowLeft size={20} />
-              Back to Shopping
+              <ArrowLeft size={16} />
+              Continue Selection
             </button>
 
-            <h2 className="text-3xl font-bold mb-8">Your Cart</h2>
+            <h2 className="text-4xl font-display italic mb-12">Your Selection</h2>
 
             {cart.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-gray-100">
-                <div className="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ShoppingCart size={32} />
+              <div className="bg-white border border-luxury-black/5 p-20 text-center shadow-2xl shadow-gold/5">
+                <div className="w-20 h-20 border border-luxury-black/10 text-luxury-black/20 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <ShoppingCart size={32} strokeWidth={1} />
                 </div>
-                <p className="text-gray-500 text-lg mb-6">Your cart is empty</p>
+                <p className="text-luxury-black/40 font-light text-lg mb-12">Your collection is currently empty</p>
                 <button 
                   onClick={() => setView('home')}
-                  className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-emerald-600/20"
+                  className="bg-luxury-black text-white px-12 py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-gold transition-all duration-500"
                 >
-                  Browse Perfumes
+                  Explore Fragrances
                 </button>
               </div>
             ) : (
-              <div className="space-y-6">
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="space-y-12">
+                <div className="bg-white border border-luxury-black/5 shadow-2xl shadow-gold/5 overflow-hidden">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-0">
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        className="w-20 h-20 object-cover rounded-xl"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{item.name}</h3>
-                        <p className="text-emerald-600 font-bold">{item.price}</p>
+                    <div key={item.id} className="flex items-center gap-8 p-8 border-b border-luxury-black/5 last:border-0">
+                      <div className="w-24 h-24 bg-luxury-cream overflow-hidden">
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover grayscale"
+                          referrerPolicy="no-referrer"
+                        />
                       </div>
-                      <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1">
+                      <div className="flex-1">
+                        <h3 className="font-display text-xl italic mb-1">{item.name}</h3>
+                        <p className="text-gold font-light tracking-widest text-sm">{item.price}</p>
+                      </div>
+                      <div className="flex items-center gap-6 border border-luxury-black/10 px-4 py-2">
                         <button 
                           onClick={() => updateQuantity(item.id, -1)}
-                          className="p-1 hover:bg-white rounded-md transition-colors"
+                          className="text-luxury-black/40 hover:text-luxury-black transition-colors"
                         >
-                          <Minus size={16} />
+                          <Minus size={14} />
                         </button>
-                        <span className="w-8 text-center font-bold">{item.quantity}</span>
+                        <span className="w-6 text-center font-medium text-sm">{item.quantity}</span>
                         <button 
                           onClick={() => updateQuantity(item.id, 1)}
-                          className="p-1 hover:bg-white rounded-md transition-colors"
+                          className="text-luxury-black/40 hover:text-luxury-black transition-colors"
                         >
-                          <Plus size={16} />
+                          <Plus size={14} />
                         </button>
                       </div>
                       <button 
                         onClick={() => removeFromCart(item.id)}
-                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        className="text-luxury-black/20 hover:text-red-400 transition-colors"
                       >
-                        <Trash2 size={20} />
+                        <Trash2 size={18} strokeWidth={1.5} />
                       </button>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-center mb-6">
-                    <span className="text-gray-600 text-lg">Total Amount</span>
-                    <span className="text-2xl font-bold text-emerald-600">
+                <div className="bg-white border border-luxury-black/5 p-12 shadow-2xl shadow-gold/5">
+                  <div className="flex justify-between items-center mb-12">
+                    <span className="text-luxury-black/40 tracking-[0.2em] uppercase text-[10px] font-semibold">Total Investment</span>
+                    <span className="text-3xl font-display italic">
                       ₦{cartTotal.toLocaleString()}
                     </span>
                   </div>
                   <button 
                     onClick={() => setView('checkout-form')}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-luxury-black text-white py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-gold transition-all duration-500 shadow-xl shadow-luxury-black/10"
                   >
                     Proceed to Checkout
                   </button>
@@ -633,61 +648,58 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="max-w-xl mx-auto px-4 py-12"
+            className="max-w-2xl mx-auto px-6 py-24"
           >
             <button 
               onClick={() => setView('cart')}
-              className="flex items-center gap-2 text-gray-600 hover:text-emerald-600 mb-8 transition-colors font-medium"
+              className="flex items-center gap-2 text-luxury-black/40 hover:text-gold mb-16 transition-colors text-[10px] tracking-[0.2em] uppercase font-medium"
             >
-              <ArrowLeft size={20} />
-              Back to Cart
+              <ArrowLeft size={16} />
+              Return to Selection
             </button>
 
-            <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <CreditCard className="text-emerald-600" />
-                Checkout Details
+            <div className="bg-white border border-luxury-black/5 p-8 md:p-20 shadow-2xl shadow-gold/5">
+              <h2 className="text-3xl font-display italic mb-12 flex items-center gap-4">
+                <CreditCard className="text-gold" strokeWidth={1} />
+                Checkout
               </h2>
-              <form onSubmit={handleCheckout} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Full Name</label>
+              <form onSubmit={handleCheckout} className="space-y-10">
+                <div className="space-y-3">
+                  <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Full Name</label>
                   <input 
                     required
                     type="text" 
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="John Doe"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                    placeholder="Your Name"
+                    className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light placeholder:text-luxury-black/20"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Email Address</label>
+                <div className="space-y-3">
+                  <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Email Address</label>
                   <input 
                     required
                     type="email" 
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
-                    placeholder="john@example.com"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                    placeholder="your@email.com"
+                    className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light placeholder:text-luxury-black/20"
                   />
                 </div>
-                <div className="pt-4 border-t border-gray-100">
-                  <div className="flex justify-between items-center mb-6">
-                    <span className="text-gray-600">Total to Pay</span>
-                    <span className="text-xl font-bold text-emerald-600">₦{cartTotal.toLocaleString()}</span>
+                <div className="pt-12 border-t border-luxury-black/5">
+                  <div className="flex justify-between items-center mb-12">
+                    <span className="text-luxury-black/40 tracking-[0.2em] uppercase text-[10px] font-semibold">Final Investment</span>
+                    <span className="text-2xl font-display italic">₦{cartTotal.toLocaleString()}</span>
                   </div>
                   <button 
                     disabled={formStatus === 'submitting'}
                     type="submit"
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full bg-luxury-black text-white py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-gold transition-all duration-500 shadow-xl shadow-luxury-black/10 flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {formStatus === 'submitting' ? (
-                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
-                      <>
-                        <CreditCard size={20} />
-                        Pay Now with Paystack
-                      </>
+                      'Secure Payment with Paystack'
                     )}
                   </button>
                 </div>
@@ -699,22 +711,22 @@ export default function App() {
         {view === 'checkout-success' && (
           <motion.main 
             key="success"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="max-w-xl mx-auto px-4 py-24 text-center"
+            className="max-w-xl mx-auto px-6 py-32 text-center"
           >
-            <div className="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8">
-              <CheckCircle2 size={48} />
+            <div className="w-24 h-24 border border-gold text-gold rounded-full flex items-center justify-center mx-auto mb-12">
+              <CheckCircle2 size={40} strokeWidth={1} />
             </div>
-            <h2 className="text-4xl font-bold mb-4">Payment Successful!</h2>
-            <p className="text-gray-600 text-lg mb-12">
-              Thank you for your purchase. Michael will contact you soon to arrange delivery.
+            <h2 className="text-4xl font-display italic mb-6">Selection Confirmed</h2>
+            <p className="text-luxury-black/50 font-light text-lg mb-16 leading-relaxed">
+              Thank you for your investment. Michael will contact you shortly to arrange the delivery of your curated fragrances.
             </p>
             <button 
               onClick={() => setView('home')}
-              className="bg-emerald-600 text-white px-12 py-4 rounded-xl font-bold shadow-lg shadow-emerald-600/20 hover:scale-105 transition-transform"
+              className="bg-luxury-black text-white px-16 py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-gold transition-all duration-500"
             >
-              Back to Home
+              Return to Gallery
             </button>
           </motion.main>
         )}
@@ -724,38 +736,41 @@ export default function App() {
             key="admin-login"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-md mx-auto px-4 py-24"
+            className="max-w-md mx-auto px-6 py-32"
           >
-            <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <LayoutDashboard size={32} />
+            <div className="bg-white border border-luxury-black/5 p-12 shadow-2xl shadow-gold/5">
+              <div className="text-center mb-12">
+                <div className="w-16 h-16 border border-luxury-black/10 text-luxury-black/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <LayoutDashboard size={24} strokeWidth={1} />
                 </div>
-                <h2 className="text-2xl font-bold">Admin Login</h2>
+                <h2 className="text-2xl font-display italic">Administrative Access</h2>
               </div>
-              <form onSubmit={handleAdminLogin} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">Username</label>
+              <form onSubmit={handleAdminLogin} className="space-y-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Username</label>
                   <input 
                     required
                     type="text" 
                     value={adminUsername}
                     onChange={(e) => setAdminUsername(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-emerald-500"
+                    className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">Password</label>
+                <div className="space-y-3">
+                  <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Password</label>
                   <input 
                     required
                     type="password" 
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-emerald-500"
+                    className="w-full bg-transparent border-b border-luxury-black/10 py-4 focus:border-gold outline-none transition-all font-light"
                   />
                 </div>
-                <button type="submit" className="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-lg">
-                  Login to Dashboard
+                <button 
+                  type="submit"
+                  className="w-full bg-luxury-black text-white py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-gold transition-all duration-500"
+                >
+                  Enter Dashboard
                 </button>
               </form>
             </div>
@@ -767,23 +782,23 @@ export default function App() {
             key="admin-dashboard"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="max-w-7xl mx-auto px-4 py-8"
+            className="max-w-7xl mx-auto px-6 py-12"
           >
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold flex items-center gap-2">
-                <LayoutDashboard className="text-emerald-600" />
-                Admin Dashboard
-              </h2>
+            <div className="flex justify-between items-end mb-16 pb-8 border-b border-luxury-black/5">
+              <div>
+                <h2 className="text-4xl font-display italic mb-2">Management Console</h2>
+                <p className="text-luxury-black/40 text-[10px] tracking-[0.2em] uppercase font-medium">Divinegrace Administrative Access</p>
+              </div>
               <button 
                 onClick={() => { setIsAdmin(false); setView('home'); }}
-                className="flex items-center gap-2 text-gray-500 hover:text-red-500 font-medium"
+                className="flex items-center gap-2 text-luxury-black/40 hover:text-red-400 transition-colors text-[10px] tracking-[0.2em] uppercase font-medium"
               >
-                <LogOut size={20} />
-                Logout
+                <LogOut size={16} />
+                Terminate Session
               </button>
             </div>
 
-            <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
+            <div className="flex gap-12 mb-16 overflow-x-auto pb-4 no-scrollbar">
               {[
                 { id: 'orders', label: 'Orders', icon: Package },
                 { id: 'messages', label: 'Messages', icon: MessageSquare },
@@ -793,40 +808,41 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setAdminTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${adminTab === tab.id ? 'bg-emerald-600 text-white shadow-lg' : 'bg-white text-gray-600 hover:bg-gray-100'}`}
+                  className={`flex items-center gap-3 text-[10px] tracking-[0.3em] uppercase font-semibold transition-all ${adminTab === tab.id ? 'text-gold' : 'text-luxury-black/30 hover:text-luxury-black'}`}
                 >
-                  <tab.icon size={18} />
+                  <tab.icon size={16} strokeWidth={1.5} />
                   {tab.label}
+                  {adminTab === tab.id && <motion.div layoutId="activeTab" className="w-1 h-1 bg-gold rounded-full ml-1" />}
                 </button>
               ))}
             </div>
 
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white border border-luxury-black/5 shadow-2xl shadow-gold/5 overflow-hidden">
               {adminTab === 'orders' && (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 border-b border-gray-100">
+                    <thead className="bg-luxury-cream border-b border-luxury-black/5">
                       <tr>
-                        <th className="px-6 py-4 font-semibold">Customer</th>
-                        <th className="px-6 py-4 font-semibold">Amount</th>
-                        <th className="px-6 py-4 font-semibold">Items</th>
-                        <th className="px-6 py-4 font-semibold">Date</th>
+                        <th className="px-8 py-6 text-[10px] tracking-[0.2em] uppercase font-bold text-luxury-black/40">Customer</th>
+                        <th className="px-8 py-6 text-[10px] tracking-[0.2em] uppercase font-bold text-luxury-black/40">Investment</th>
+                        <th className="px-8 py-6 text-[10px] tracking-[0.2em] uppercase font-bold text-luxury-black/40">Collection</th>
+                        <th className="px-8 py-6 text-[10px] tracking-[0.2em] uppercase font-bold text-luxury-black/40">Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-luxury-black/5">
                       {adminData.orders.map((order) => (
-                        <tr key={order.id}>
-                          <td className="px-6 py-4">
-                            <div className="font-medium">{order.customerName}</div>
-                            <div className="text-sm text-gray-500">{order.customerEmail}</div>
+                        <tr key={order.id} className="hover:bg-luxury-cream/30 transition-colors">
+                          <td className="px-8 py-6">
+                            <div className="font-display text-lg italic">{order.customerName}</div>
+                            <div className="text-[10px] text-luxury-black/40 font-medium">{order.customerEmail}</div>
                           </td>
-                          <td className="px-6 py-4 font-bold text-emerald-600">₦{order.totalAmount.toLocaleString()}</td>
-                          <td className="px-6 py-4 text-sm">
+                          <td className="px-8 py-6 font-display text-lg text-gold italic">₦{order.totalAmount.toLocaleString()}</td>
+                          <td className="px-8 py-6 text-xs font-light">
                             {JSON.parse(order.items).map((i: any, idx: number) => (
-                              <div key={idx}>{i.name} x{i.quantity}</div>
+                              <div key={idx} className="mb-1">{i.name} <span className="text-luxury-black/30 ml-1">x{i.quantity}</span></div>
                             ))}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
+                          <td className="px-8 py-6 text-[10px] tracking-[0.1em] text-luxury-black/40 font-medium">{new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -835,54 +851,61 @@ export default function App() {
               )}
 
               {adminTab === 'messages' && (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-luxury-black/5">
                   {adminData.messages.map((msg) => (
-                    <div key={msg.id} className="p-6">
-                      <div className="flex justify-between items-start mb-4">
+                    <div key={msg.id} className="p-12 hover:bg-luxury-cream/30 transition-colors">
+                      <div className="flex justify-between items-start mb-8">
                         <div>
-                          <h3 className="font-bold text-lg">{msg.name}</h3>
-                          <p className="text-emerald-600 text-sm">{msg.email}</p>
+                          <h3 className="font-display text-2xl italic mb-1">{msg.name}</h3>
+                          <p className="text-gold text-[10px] tracking-[0.2em] uppercase font-semibold">{msg.email}</p>
                         </div>
-                        <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full uppercase">
+                        <span className="text-[8px] tracking-[0.3em] uppercase px-3 py-1 border border-gold text-gold font-bold">
                           {msg.service}
                         </span>
                       </div>
-                      <p className="text-gray-600 bg-gray-50 p-4 rounded-xl italic">"{msg.message}"</p>
-                      <p className="text-xs text-gray-400 mt-4">{new Date(msg.createdAt).toLocaleString()}</p>
+                      <p className="text-luxury-black/60 font-light leading-relaxed italic text-lg">"{msg.message}"</p>
+                      <p className="text-[10px] tracking-[0.1em] text-luxury-black/30 mt-8 font-medium">{new Date(msg.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   ))}
                 </div>
               )}
 
               {adminTab === 'perfumes' && (
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold">Manage Inventory</h3>
+                <div className="p-12">
+                  <div className="flex justify-between items-center mb-12">
+                    <h3 className="text-2xl font-display italic">Fragrance Inventory</h3>
                     <button 
                       onClick={() => setEditingPerfume({ name: '', price: '₦0', priceValue: 0, image: '', inStock: 1 })}
-                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2"
+                      className="bg-luxury-black text-white px-8 py-3 text-[10px] tracking-[0.2em] uppercase font-medium hover:bg-gold transition-all"
                     >
-                      <Plus size={18} /> Add New
+                      Add New Scent
                     </button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {perfumes.map((p) => (
-                      <div key={p.id} className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                        <img src={p.image} className="w-full h-32 object-cover rounded-xl mb-4" />
-                        <h4 className="font-bold">{p.name}</h4>
-                        <p className="text-emerald-600 font-bold mb-4">{p.price}</p>
+                      <div key={p.id} className="bg-luxury-cream/30 border border-luxury-black/5 p-6 group">
+                        <img src={p.image} className="w-full aspect-square object-cover mb-6 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h4 className="font-display text-lg italic">{p.name}</h4>
+                            <p className="text-gold text-sm tracking-widest">{p.price}</p>
+                          </div>
+                          <span className={`text-[8px] tracking-[0.2em] uppercase px-2 py-1 border ${p.inStock ? 'border-gold text-gold' : 'border-luxury-black/20 text-luxury-black/40'}`}>
+                            {p.inStock ? 'In Stock' : 'Sold Out'}
+                          </span>
+                        </div>
                         <div className="flex gap-2">
                           <button 
                             onClick={() => setEditingPerfume(p)}
-                            className="flex-1 bg-white border border-gray-200 py-2 rounded-lg text-sm font-bold hover:bg-gray-100"
+                            className="flex-1 border border-luxury-black/10 py-3 text-[9px] tracking-[0.2em] uppercase hover:border-luxury-black transition-all"
                           >
                             Edit
                           </button>
                           <button 
                             onClick={() => handleDeletePerfume(p.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                            className="px-4 border border-luxury-black/10 text-luxury-black/20 hover:text-red-400 hover:border-red-400 transition-all"
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </div>
@@ -892,20 +915,20 @@ export default function App() {
               )}
 
               {adminTab === 'portfolio' && (
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-6">Portfolio Management</h3>
-                  <div className="grid grid-cols-1 gap-6">
+                <div className="p-12">
+                  <h3 className="text-2xl font-display italic mb-12">Cinematic Portfolio</h3>
+                  <div className="grid grid-cols-1 gap-12">
                     {portfolio.map((p) => (
-                      <div key={p.id} className="flex gap-6 bg-gray-50 p-4 rounded-2xl border border-gray-200">
-                        <img src={p.image} className="w-32 h-32 object-cover rounded-xl" />
+                      <div key={p.id} className="flex flex-col md:flex-row gap-8 items-center border-b border-luxury-black/5 pb-12">
+                        <img src={p.image} className="w-full md:w-64 aspect-video object-cover grayscale" />
                         <div className="flex-1">
-                          <h4 className="font-bold text-lg">{p.title}</h4>
-                          <p className="text-gray-500 text-sm mb-4 line-clamp-2">{p.description}</p>
+                          <h4 className="text-2xl font-display italic mb-2">{p.title}</h4>
+                          <p className="text-luxury-black/40 text-sm font-light mb-6 leading-relaxed">{p.description}</p>
                           <button 
                             onClick={() => setEditingPortfolio(p)}
-                            className="bg-white border border-gray-200 px-4 py-2 rounded-lg text-sm font-bold"
+                            className="border border-luxury-black/10 px-8 py-3 text-[10px] tracking-[0.2em] uppercase font-medium hover:border-luxury-black transition-all"
                           >
-                            Edit Details
+                            Edit Narrative
                           </button>
                         </div>
                       </div>
@@ -920,61 +943,62 @@ export default function App() {
               {editingPerfume && (
                 <motion.div 
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  className="fixed inset-0 z-[60] bg-luxury-black/80 backdrop-blur-md flex items-center justify-center p-6"
                 >
                   <motion.div 
-                    initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
-                    className="bg-white rounded-3xl w-full max-w-lg overflow-hidden"
+                    initial={{ scale: 0.98, y: 20 }} animate={{ scale: 1, y: 0 }}
+                    className="bg-white border border-luxury-black/5 w-full max-w-lg overflow-hidden shadow-2xl"
                   >
-                    <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                      <h3 className="text-xl font-bold">{editingPerfume.id ? 'Edit Perfume' : 'Add Perfume'}</h3>
-                      <button onClick={() => setEditingPerfume(null)}><X /></button>
+                    <div className="p-8 border-b border-luxury-black/5 flex justify-between items-center">
+                      <h3 className="text-2xl font-display italic">{editingPerfume.id ? 'Edit Fragrance' : 'New Fragrance'}</h3>
+                      <button onClick={() => setEditingPerfume(null)} className="text-luxury-black/20 hover:text-luxury-black transition-colors"><X size={20} /></button>
                     </div>
-                    <form onSubmit={handleUpdatePerfume} className="p-6 space-y-4">
+                    <form onSubmit={handleUpdatePerfume} className="p-8 space-y-8">
                       <div className="space-y-2">
-                        <label className="text-sm font-semibold">Name</label>
+                        <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Fragrance Name</label>
                         <input 
                           required value={editingPerfume.name} 
                           onChange={e => setEditingPerfume({...editingPerfume, name: e.target.value})}
-                          className="w-full px-4 py-2 rounded-lg border"
+                          className="w-full bg-transparent border-b border-luxury-black/10 py-3 focus:border-gold outline-none transition-all font-light"
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-2">
-                          <label className="text-sm font-semibold">Display Price (₦)</label>
+                          <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Display Price</label>
                           <input 
                             required value={editingPerfume.price} 
                             onChange={e => setEditingPerfume({...editingPerfume, price: e.target.value})}
-                            className="w-full px-4 py-2 rounded-lg border"
+                            className="w-full bg-transparent border-b border-luxury-black/10 py-3 focus:border-gold outline-none transition-all font-light"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-semibold">Numeric Value</label>
+                          <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Numeric Value</label>
                           <input 
                             required type="number" value={editingPerfume.priceValue} 
                             onChange={e => setEditingPerfume({...editingPerfume, priceValue: parseInt(e.target.value)})}
-                            className="w-full px-4 py-2 rounded-lg border"
+                            className="w-full bg-transparent border-b border-luxury-black/10 py-3 focus:border-gold outline-none transition-all font-light"
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-semibold">Image URL</label>
+                        <label className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/40">Image URL</label>
                         <input 
                           required value={editingPerfume.image} 
                           onChange={e => setEditingPerfume({...editingPerfume, image: e.target.value})}
-                          className="w-full px-4 py-2 rounded-lg border"
+                          className="w-full bg-transparent border-b border-luxury-black/10 py-3 focus:border-gold outline-none transition-all font-light"
                         />
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <input 
                           type="checkbox" checked={!!editingPerfume.inStock} 
                           onChange={e => setEditingPerfume({...editingPerfume, inStock: e.target.checked ? 1 : 0})}
                           id="inStockCheck"
+                          className="w-4 h-4 accent-gold"
                         />
-                        <label htmlFor="inStockCheck" className="text-sm font-semibold">In Stock</label>
+                        <label htmlFor="inStockCheck" className="text-[10px] tracking-[0.2em] uppercase font-semibold text-luxury-black/60">Available in Collection</label>
                       </div>
-                      <button type="submit" className="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2">
-                        <Save size={18} /> Save Changes
+                      <button type="submit" className="w-full bg-luxury-black text-white py-5 text-[10px] tracking-[0.4em] uppercase font-medium hover:bg-gold transition-all duration-500">
+                        Save Fragrance Details
                       </button>
                     </form>
                   </motion.div>
@@ -986,38 +1010,42 @@ export default function App() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-12 px-4 mt-24">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+      <footer className="bg-white border-t border-luxury-black/5 py-24 px-6 mt-48">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-24">
           <div>
-            <h3 className="text-xl font-bold text-emerald-600 mb-4">ScentFrame</h3>
-            <p className="text-gray-500">Premium perfumes and cinematic storytelling. Based in Benin City, Nigeria.</p>
+            <h3 className="text-2xl font-display font-medium tracking-widest uppercase mb-8">Divinegrace</h3>
+            <p className="text-luxury-black/50 font-light leading-relaxed">Premium perfumes and cinematic storytelling by Michael. Based in Benin City, Nigeria.</p>
           </div>
           <div>
-            <h4 className="font-bold mb-4">Contact Us</h4>
-            <div className="space-y-3 text-gray-600">
-              <a href="tel:+2348000000000" className="flex items-center gap-2 hover:text-emerald-600 transition-colors">
-                <Phone size={18} />
-                +234 800 000 0000
+            <h4 className="text-[10px] tracking-[0.2em] uppercase font-bold mb-8 text-luxury-black/40">Contact</h4>
+            <div className="space-y-4 text-luxury-black/60 font-light">
+              <a href="tel:+2348138329374" className="flex items-center gap-3 hover:text-gold transition-colors">
+                <Phone size={16} strokeWidth={1.5} />
+                +234 813 832 9374
               </a>
-              <a href="https://instagram.com" className="flex items-center gap-2 hover:text-emerald-600 transition-colors">
-                <Instagram size={18} />
-                @scentframe_ng
+              <a href="mailto:osmosistrade7@gmail.com" className="flex items-center gap-3 hover:text-gold transition-colors">
+                <Mail size={16} strokeWidth={1.5} />
+                osmosistrade7@gmail.com
+              </a>
+              <a href="https://instagram.com" className="flex items-center gap-3 hover:text-gold transition-colors">
+                <Instagram size={16} strokeWidth={1.5} />
+                @divinegrace_perfumes
               </a>
             </div>
           </div>
           <div>
-            <h4 className="font-bold mb-4">Admin</h4>
+            <h4 className="text-[10px] tracking-[0.2em] uppercase font-bold mb-8 text-luxury-black/40">Administrative</h4>
             <button 
               onClick={() => setView('admin-login')}
-              className="text-gray-500 hover:text-emerald-600 flex items-center gap-2 text-sm"
+              className="text-luxury-black/40 hover:text-gold flex items-center gap-3 text-[10px] tracking-[0.2em] uppercase font-medium transition-colors"
             >
-              <LayoutDashboard size={16} />
-              Admin Dashboard
+              <LayoutDashboard size={16} strokeWidth={1.5} />
+              Access Dashboard
             </button>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-100 text-center text-gray-400 text-sm">
-          © 2025 ScentFrame. All rights reserved.
+        <div className="max-w-7xl mx-auto mt-24 pt-12 border-t border-luxury-black/5 text-center text-luxury-black/30 text-[10px] tracking-[0.2em] uppercase font-medium">
+          © 2025 Divinegrace perfumes. All rights reserved.
         </div>
       </footer>
     </div>
