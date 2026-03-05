@@ -6,9 +6,18 @@
   --font-display: "Playfair Display", serif;
   --font-sans: "Inter", sans-serif;
   
-  --color-gold: #C5A059;
-  --color-luxury-black: #1A1A1A;
+  --color-gold: #D4AF37;
+  --color-vibrant-gold: #FFD700;
+  --color-emerald: #06402B;
+  --color-vibrant-emerald: #00A86B;
+  --color-deep-burgundy: #4A0E0E;
+  --color-vibrant-burgundy: #800020;
+  --color-royal-blue: #002366;
+  --color-amethyst: #9966CC;
+  --color-luxury-black: #0A0A0A;
   --color-luxury-cream: #FDFCF8;
+  --color-soft-rose: #FFF5F5;
+  --color-vibrant-orange: #FF4500;
 }
 
 @layer base {
