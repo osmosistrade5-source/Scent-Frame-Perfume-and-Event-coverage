@@ -89,6 +89,11 @@ export default function App() {
         fetch('/api/perfumes'),
         fetch('/api/portfolio')
       ]);
+      
+      if (!perfResponse.ok || !portResponse.ok) {
+        throw new Error(`Server responded with ${perfResponse.status} or ${portResponse.status}`);
+      }
+
       const perfData = await perfResponse.json();
       const portData = await portResponse.json();
       setPerfumes(perfData);
@@ -218,6 +223,12 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: adminUsername, password: adminPassword })
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Login failed with status ${response.status}: ${errorText}`);
+      }
+
       const data = await response.json();
       if (data.success) {
         setIsAdmin(true);
@@ -228,6 +239,7 @@ export default function App() {
       }
     } catch (error) {
       console.error("Login error:", error);
+      alert("Login failed. Please check the console for details.");
     }
   };
 

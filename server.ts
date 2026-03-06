@@ -10,7 +10,8 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const db = new Database("scentframe.db");
+const dbPath = process.env.VERCEL ? path.join("/tmp", "scentframe.db") : "scentframe.db";
+const db = new Database(dbPath);
 
 // Initialize Database
 db.exec(`
@@ -88,88 +89,88 @@ if (portfolioCount.count === 0) {
   insertWork.run(p4, "Igue Festival 2024", "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&h=400&fit=crop", "video");
 }
 
+const app = express();
+const PORT = 3000;
+
+app.use(express.json());
+
+// API Routes
+app.get("/api/perfumes", (req, res) => {
+  const perfumes = db.prepare("SELECT * FROM perfumes").all();
+  res.json(perfumes);
+});
+
+app.get("/api/portfolio", (req, res) => {
+  const portfolio = db.prepare("SELECT * FROM portfolio").all();
+  const portfolioWithWorks = portfolio.map((p: any) => {
+    const works = db.prepare("SELECT * FROM portfolio_works WHERE portfolio_id = ?").all(p.id);
+    return { ...p, works };
+  });
+  res.json(portfolioWithWorks);
+});
+
+app.post("/api/messages", (req, res) => {
+  const { name, email, service, message } = req.body;
+  db.prepare("INSERT INTO messages (name, email, service, message) VALUES (?, ?, ?, ?)").run(name, email, service, message);
+  res.json({ success: true });
+});
+
+app.post("/api/orders", (req, res) => {
+  const { customerName, customerEmail, totalAmount, items } = req.body;
+  db.prepare("INSERT INTO orders (customerName, customerEmail, totalAmount, items) VALUES (?, ?, ?, ?)").run(customerName, customerEmail, totalAmount, JSON.stringify(items));
+  res.json({ success: true });
+});
+
+// Admin Routes
+app.post("/api/admin/login", (req, res) => {
+  const { username, password } = req.body;
+  const adminUser = process.env.ADMIN_USERNAME || "admin";
+  const adminPass = process.env.ADMIN_PASSWORD || "password123";
+
+  if (username === adminUser && password === adminPass) {
+    res.json({ success: true, token: "fake-jwt-token" });
+  } else {
+    res.status(401).json({ success: false, message: "Invalid credentials" });
+  }
+});
+
+app.get("/api/admin/data", (req, res) => {
+  // In a real app, verify token here
+  const messages = db.prepare("SELECT * FROM messages ORDER BY createdAt DESC").all();
+  const orders = db.prepare("SELECT * FROM orders ORDER BY createdAt DESC").all();
+  res.json({ messages, orders });
+});
+
+app.put("/api/admin/perfumes/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, price, priceValue, image, inStock } = req.body;
+  db.prepare("UPDATE perfumes SET name = ?, price = ?, priceValue = ?, image = ?, inStock = ? WHERE id = ?")
+    .run(name, price, priceValue, image, inStock, id);
+  res.json({ success: true });
+});
+
+app.post("/api/admin/perfumes", (req, res) => {
+  const { name, price, priceValue, image, inStock } = req.body;
+  db.prepare("INSERT INTO perfumes (name, price, priceValue, image, inStock) VALUES (?, ?, ?, ?, ?)")
+    .run(name, price, priceValue, image, inStock);
+  res.json({ success: true });
+});
+
+app.delete("/api/admin/perfumes/:id", (req, res) => {
+  const { id } = req.params;
+  db.prepare("DELETE FROM perfumes WHERE id = ?").run(id);
+  res.json({ success: true });
+});
+
+app.put("/api/admin/portfolio/:id", (req, res) => {
+  const { id } = req.params;
+  const { title, image, description } = req.body;
+  db.prepare("UPDATE portfolio SET title = ?, image = ?, description = ? WHERE id = ?")
+    .run(title, image, description, id);
+  res.json({ success: true });
+});
+
 async function startServer() {
-  const app = express();
-  const PORT = 3000;
-
-  app.use(express.json());
-
-  // API Routes
-  app.get("/api/perfumes", (req, res) => {
-    const perfumes = db.prepare("SELECT * FROM perfumes").all();
-    res.json(perfumes);
-  });
-
-  app.get("/api/portfolio", (req, res) => {
-    const portfolio = db.prepare("SELECT * FROM portfolio").all();
-    const portfolioWithWorks = portfolio.map((p: any) => {
-      const works = db.prepare("SELECT * FROM portfolio_works WHERE portfolio_id = ?").all(p.id);
-      return { ...p, works };
-    });
-    res.json(portfolioWithWorks);
-  });
-
-  app.post("/api/messages", (req, res) => {
-    const { name, email, service, message } = req.body;
-    db.prepare("INSERT INTO messages (name, email, service, message) VALUES (?, ?, ?, ?)").run(name, email, service, message);
-    res.json({ success: true });
-  });
-
-  app.post("/api/orders", (req, res) => {
-    const { customerName, customerEmail, totalAmount, items } = req.body;
-    db.prepare("INSERT INTO orders (customerName, customerEmail, totalAmount, items) VALUES (?, ?, ?, ?)").run(customerName, customerEmail, totalAmount, JSON.stringify(items));
-    res.json({ success: true });
-  });
-
-  // Admin Routes
-  app.post("/api/admin/login", (req, res) => {
-    const { username, password } = req.body;
-    const adminUser = process.env.ADMIN_USERNAME || "admin";
-    const adminPass = process.env.ADMIN_PASSWORD || "password123";
-
-    if (username === adminUser && password === adminPass) {
-      res.json({ success: true, token: "fake-jwt-token" });
-    } else {
-      res.status(401).json({ success: false, message: "Invalid credentials" });
-    }
-  });
-
-  app.get("/api/admin/data", (req, res) => {
-    // In a real app, verify token here
-    const messages = db.prepare("SELECT * FROM messages ORDER BY createdAt DESC").all();
-    const orders = db.prepare("SELECT * FROM orders ORDER BY createdAt DESC").all();
-    res.json({ messages, orders });
-  });
-
-  app.put("/api/admin/perfumes/:id", (req, res) => {
-    const { id } = req.params;
-    const { name, price, priceValue, image, inStock } = req.body;
-    db.prepare("UPDATE perfumes SET name = ?, price = ?, priceValue = ?, image = ?, inStock = ? WHERE id = ?")
-      .run(name, price, priceValue, image, inStock, id);
-    res.json({ success: true });
-  });
-
-  app.post("/api/admin/perfumes", (req, res) => {
-    const { name, price, priceValue, image, inStock } = req.body;
-    db.prepare("INSERT INTO perfumes (name, price, priceValue, image, inStock) VALUES (?, ?, ?, ?, ?)")
-      .run(name, price, priceValue, image, inStock);
-    res.json({ success: true });
-  });
-
-  app.delete("/api/admin/perfumes/:id", (req, res) => {
-    const { id } = req.params;
-    db.prepare("DELETE FROM perfumes WHERE id = ?").run(id);
-    res.json({ success: true });
-  });
-
-  app.put("/api/admin/portfolio/:id", (req, res) => {
-    const { id } = req.params;
-    const { title, image, description } = req.body;
-    db.prepare("UPDATE portfolio SET title = ?, image = ?, description = ? WHERE id = ?")
-      .run(title, image, description, id);
-    res.json({ success: true });
-  });
-
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -184,9 +185,14 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  // Only listen if not on Vercel
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
 }
 
 startServer();
+
+export default app;
