@@ -10,18 +10,23 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", supabase: !!supabase });
+});
+
 // API Routes
 app.get("/api/perfumes", async (req, res) => {
-  if (!supabaseUrl || !supabaseKey) {
+  if (!supabase) {
     return res.json([
       { id: 1, name: "Creed Aventus (Mock)", price: "₦18,000", priceValue: 18000, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop", inStock: 1 },
       { id: 2, name: "Sauvage Elixir (Mock)", price: "₦22,000", priceValue: 22000, image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop", inStock: 1 }
@@ -33,7 +38,7 @@ app.get("/api/perfumes", async (req, res) => {
 });
 
 app.get("/api/portfolio", async (req, res) => {
-  if (!supabaseUrl || !supabaseKey) {
+  if (!supabase) {
     return res.json([
       { id: 1, title: "Wedding Highlight (Mock)", image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=400&fit=crop", description: "Mock description for preview.", works: [] }
     ]);
@@ -51,6 +56,7 @@ app.get("/api/portfolio", async (req, res) => {
 
 app.post("/api/messages", async (req, res) => {
   const { name, email, service, message } = req.body;
+  if (!supabase) return res.json({ success: true, mock: true });
   const { error } = await supabase.from("messages").insert([{ name, email, service, message }]);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -58,6 +64,7 @@ app.post("/api/messages", async (req, res) => {
 
 app.post("/api/orders", async (req, res) => {
   const { customerName, customerEmail, totalAmount, items } = req.body;
+  if (!supabase) return res.json({ success: true, mock: true });
   const { error } = await supabase.from("orders").insert([{ 
     customerName, 
     customerEmail, 
@@ -81,21 +88,26 @@ app.post("/api/admin/login", async (req, res) => {
   }
 
   // Then check Supabase users table
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("username", username)
-    .eq("password", password) // In a real app, use hashed passwords!
-    .single();
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("username", username)
+      .eq("password", password) // In a real app, use hashed passwords!
+      .single();
 
-  if (data && !error) {
-    res.json({ success: true, token: "fake-jwt-token" });
-  } else {
-    res.status(401).json({ success: false, message: "Invalid credentials" });
+    if (data && !error) {
+      return res.json({ success: true, token: "fake-jwt-token" });
+    }
   }
+
+  res.status(401).json({ success: false, message: "Invalid credentials" });
 });
 
 app.get("/api/admin/data", async (req, res) => {
+  if (!supabase) {
+    return res.json({ messages: [], orders: [] });
+  }
   const { data: messages, error: msgError } = await supabase.from("messages").select("*").order("createdAt", { ascending: false });
   const { data: orders, error: ordError } = await supabase.from("orders").select("*").order("createdAt", { ascending: false });
   
@@ -106,6 +118,7 @@ app.get("/api/admin/data", async (req, res) => {
 app.put("/api/admin/perfumes/:id", async (req, res) => {
   const { id } = req.params;
   const { name, price, priceValue, image, inStock } = req.body;
+  if (!supabase) return res.json({ success: true });
   const { error } = await supabase.from("perfumes").update({ name, price, priceValue, image, inStock }).eq("id", id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -113,6 +126,7 @@ app.put("/api/admin/perfumes/:id", async (req, res) => {
 
 app.post("/api/admin/perfumes", async (req, res) => {
   const { name, price, priceValue, image, inStock } = req.body;
+  if (!supabase) return res.json({ success: true });
   const { error } = await supabase.from("perfumes").insert([{ name, price, priceValue, image, inStock }]);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -120,6 +134,7 @@ app.post("/api/admin/perfumes", async (req, res) => {
 
 app.delete("/api/admin/perfumes/:id", async (req, res) => {
   const { id } = req.params;
+  if (!supabase) return res.json({ success: true });
   const { error } = await supabase.from("perfumes").delete().eq("id", id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -128,6 +143,7 @@ app.delete("/api/admin/perfumes/:id", async (req, res) => {
 app.put("/api/admin/portfolio/:id", async (req, res) => {
   const { id } = req.params;
   const { title, image, description } = req.body;
+  if (!supabase) return res.json({ success: true });
   const { error } = await supabase.from("portfolio").update({ title, image, description }).eq("id", id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
