@@ -21,12 +21,23 @@ app.use(express.json());
 
 // API Routes
 app.get("/api/perfumes", async (req, res) => {
+  if (!supabaseUrl || !supabaseKey) {
+    return res.json([
+      { id: 1, name: "Creed Aventus (Mock)", price: "₦18,000", priceValue: 18000, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop", inStock: 1 },
+      { id: 2, name: "Sauvage Elixir (Mock)", price: "₦22,000", priceValue: 22000, image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop", inStock: 1 }
+    ]);
+  }
   const { data, error } = await supabase.from("perfumes").select("*");
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
 app.get("/api/portfolio", async (req, res) => {
+  if (!supabaseUrl || !supabaseKey) {
+    return res.json([
+      { id: 1, title: "Wedding Highlight (Mock)", image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=400&fit=crop", description: "Mock description for preview.", works: [] }
+    ]);
+  }
   const { data: portfolio, error: portError } = await supabase.from("portfolio").select("*");
   if (portError) return res.status(500).json({ error: portError.message });
 
