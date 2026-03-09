@@ -644,10 +644,10 @@ export default function App() {
           >
             <button 
               onClick={() => setView('home')}
-              className="flex items-center gap-2 text-vibrant-emerald hover:text-vibrant-orange mb-16 transition-all text-[10px] tracking-[0.3em] uppercase font-black bg-white/50 py-3 px-6 rounded-full border border-vibrant-emerald/10"
+              className="flex items-center gap-3 text-vibrant-emerald hover:text-vibrant-orange mb-16 transition-all text-[10px] tracking-[0.3em] uppercase font-black bg-white py-4 px-8 rounded-full border-2 border-vibrant-emerald/10 shadow-md group"
             >
-              <ArrowLeft size={16} />
-              Continue Selection
+              <Plus size={20} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
+              Add More Perfumes
             </button>
 
             <h2 className="text-5xl font-display italic mb-12 text-vibrant-emerald">Your Selection</h2>
@@ -669,40 +669,45 @@ export default function App() {
               <div className="space-y-12">
                 <div className="bg-white/80 backdrop-blur-xl border border-white shadow-2xl rounded-[2rem] overflow-hidden">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex items-center gap-8 p-10 border-b border-vibrant-emerald/5 last:border-0 hover:bg-vibrant-emerald/5 transition-colors group">
-                      <div className="w-32 h-32 bg-soft-rose rounded-2xl overflow-hidden shadow-lg group-hover:scale-105 transition-transform">
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                          referrerPolicy="no-referrer"
-                        />
+                    <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 p-6 sm:p-10 border-b border-vibrant-emerald/5 last:border-0 hover:bg-vibrant-emerald/5 transition-colors group">
+                      <div className="flex items-center gap-6 flex-1 w-full">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-soft-rose rounded-2xl overflow-hidden shadow-lg group-hover:scale-105 transition-transform shrink-0">
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-display text-xl sm:text-2xl italic mb-1 text-vibrant-emerald">{item.name}</h3>
+                          <p className="text-vibrant-orange font-black tracking-widest text-xs sm:text-sm">{item.price}</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-display text-2xl italic mb-1 text-vibrant-emerald">{item.name}</h3>
-                        <p className="text-vibrant-orange font-black tracking-widest text-sm">{item.price}</p>
-                      </div>
-                      <div className="flex items-center gap-6 border-2 border-vibrant-emerald/10 px-6 py-3 rounded-full bg-white">
+                      
+                      <div className="flex items-center justify-between w-full sm:w-auto gap-6">
+                        <div className="flex items-center gap-4 bg-vibrant-emerald/5 p-2 rounded-2xl border border-vibrant-emerald/10">
+                          <button 
+                            onClick={() => updateQuantity(item.id, -1)}
+                            className="w-10 h-10 flex items-center justify-center bg-white text-vibrant-emerald hover:bg-vibrant-burgundy hover:text-white transition-all rounded-xl shadow-sm"
+                          >
+                            <Minus size={14} strokeWidth={3} />
+                          </button>
+                          <span className="w-8 text-center font-black text-lg text-vibrant-emerald">{item.quantity}</span>
+                          <button 
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="w-10 h-10 flex items-center justify-center bg-white text-vibrant-emerald hover:bg-vibrant-emerald hover:text-white transition-all rounded-xl shadow-sm"
+                          >
+                            <Plus size={14} strokeWidth={3} />
+                          </button>
+                        </div>
                         <button 
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="text-vibrant-emerald hover:text-vibrant-orange transition-colors"
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-vibrant-burgundy/30 hover:text-vibrant-orange transition-colors p-3 hover:bg-vibrant-orange/5 rounded-full"
                         >
-                          <Minus size={16} />
-                        </button>
-                        <span className="w-8 text-center font-black text-lg text-vibrant-emerald">{item.quantity}</span>
-                        <button 
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="text-vibrant-emerald hover:text-vibrant-orange transition-colors"
-                        >
-                          <Plus size={16} />
+                          <Trash2 size={22} strokeWidth={1.5} />
                         </button>
                       </div>
-                      <button 
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-vibrant-burgundy/30 hover:text-vibrant-orange transition-colors p-3 hover:bg-vibrant-orange/5 rounded-full"
-                      >
-                        <Trash2 size={22} strokeWidth={1.5} />
-                      </button>
                     </div>
                   ))}
                 </div>
