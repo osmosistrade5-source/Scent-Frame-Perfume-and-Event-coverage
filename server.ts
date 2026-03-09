@@ -41,7 +41,10 @@ app.get("/api/perfumes", async (req, res) => {
     ]);
   }
   const { data, error } = await supabase.from("perfumes").select("*");
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error("Supabase Error (perfumes):", error);
+    return res.status(500).json({ error: error.message, code: error.code });
+  }
   res.json(data);
 });
 
@@ -52,7 +55,10 @@ app.get("/api/portfolio", async (req, res) => {
     ]);
   }
   const { data: portfolio, error: portError } = await supabase.from("portfolio").select("*");
-  if (portError) return res.status(500).json({ error: portError.message });
+  if (portError) {
+    console.error("Supabase Error (portfolio):", portError);
+    return res.status(500).json({ error: portError.message, code: portError.code });
+  }
 
   const portfolioWithWorks = await Promise.all(portfolio.map(async (p: any) => {
     const { data: works, error: worksError } = await supabase.from("portfolio_works").select("*").eq("portfolio_id", p.id);
