@@ -66,6 +66,20 @@ export default function App() {
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerName, setCustomerName] = useState('');
 
+  // Media Helper
+  const getMediaUrl = (path: string) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    // If it's a local path, serve it through our Media API
+    const filename = path.split('/').pop();
+    return `/api/media/${filename}`;
+  };
+
+  const handleMediaError = (e: any) => {
+    const target = e.target as HTMLImageElement;
+    target.src = 'https://picsum.photos/seed/error/800/600';
+  };
+
   // Admin State
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminUsername, setAdminUsername] = useState('');
@@ -364,10 +378,11 @@ export default function App() {
                     >
                       <div className="aspect-[4/5] bg-gradient-to-tr from-soft-rose to-vibrant-gold/5 relative overflow-hidden mb-6 rounded-xl">
                         <img 
-                          src={item.image} 
+                          src={getMediaUrl(item.image)} 
                           alt={item.name} 
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s]"
                           referrerPolicy="no-referrer"
+                          onError={handleMediaError}
                         />
                         {!item.inStock && (
                           <div className="absolute inset-0 bg-vibrant-burgundy/30 backdrop-blur-[2px] flex items-center justify-center">
@@ -406,10 +421,11 @@ export default function App() {
                     >
                       <div className="aspect-video bg-vibrant-burgundy overflow-hidden mb-6 relative rounded-2xl shadow-xl">
                         <img 
-                          src={item.image} 
+                          src={getMediaUrl(item.image)} 
                           alt={item.title} 
                           className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[1.5s] grayscale group-hover:grayscale-0"
                           referrerPolicy="no-referrer"
+                          onError={handleMediaError}
                         />
                         <div className="absolute inset-0 bg-gradient-to-br from-royal-blue/40 via-transparent to-vibrant-burgundy/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <div className="w-24 h-24 rounded-full border-2 border-white/50 flex items-center justify-center bg-white/20 backdrop-blur-md shadow-2xl scale-90 group-hover:scale-100 transition-transform duration-500">
@@ -558,12 +574,25 @@ export default function App() {
               {selectedService.works.map((work) => (
                 <div key={work.id} className="group relative">
                   <div className="aspect-video relative overflow-hidden bg-luxury-black mb-8 rounded-3xl shadow-2xl">
-                    <img 
-                      src={work.image} 
-                      alt={work.title} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s] grayscale group-hover:grayscale-0"
-                      referrerPolicy="no-referrer"
-                    />
+                    {work.type === 'video' ? (
+                      <video 
+                        src={getMediaUrl(work.image)} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]"
+                        controls
+                        muted
+                        loop
+                        playsInline
+                        onError={handleMediaError}
+                      />
+                    ) : (
+                      <img 
+                        src={getMediaUrl(work.image)} 
+                        alt={work.title} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s] grayscale group-hover:grayscale-0"
+                        referrerPolicy="no-referrer"
+                        onError={handleMediaError}
+                      />
+                    )}
                     <div className="absolute top-6 right-6">
                       <span className="bg-vibrant-gold text-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg">
                         {work.type}
@@ -953,7 +982,7 @@ export default function App() {
                     {perfumes.map((p) => (
                       <div key={p.id} className="bg-white border border-vibrant-orange/10 p-8 group rounded-3xl hover:shadow-2xl transition-all duration-500">
                         <div className="relative overflow-hidden rounded-2xl mb-8 border border-vibrant-orange/5">
-                          <img src={p.image} className="w-full aspect-square object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                          <img src={getMediaUrl(p.image)} onError={handleMediaError} className="w-full aspect-square object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
                           <div className="absolute inset-0 bg-gradient-to-t from-vibrant-orange/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </div>
                         <div className="flex justify-between items-start mb-6">
@@ -992,7 +1021,7 @@ export default function App() {
                     {portfolio.map((p) => (
                       <div key={p.id} className="flex flex-col md:flex-row gap-12 items-center border-b border-amethyst/10 pb-12 group">
                         <div className="relative overflow-hidden rounded-2xl shadow-2xl border-4 border-white">
-                          <img src={p.image} className="w-full md:w-80 aspect-video object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" />
+                          <img src={getMediaUrl(p.image)} onError={handleMediaError} className="w-full md:w-80 aspect-video object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" />
                           <div className="absolute inset-0 bg-gradient-to-tr from-amethyst/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </div>
                         <div className="flex-1">

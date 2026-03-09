@@ -3,6 +3,8 @@ import { createServer as createViteServer } from "vite";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 import path from "path";
+import fs from "fs";
+import mime from "mime-types";
 import { fileURLToPath } from "url";
 
 dotenv.config();
@@ -14,11 +16,15 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 let supabase: any = null;
-if (supabaseUrl && supabaseKey && supabaseUrl.startsWith('http')) {
+if (supabaseUrl && supabaseKey) {
   try {
-    supabase = createClient(supabaseUrl, supabaseKey);
+    // Basic URL validation
+    const url = new URL(supabaseUrl);
+    if (url.protocol.startsWith('http')) {
+      supabase = createClient(supabaseUrl, supabaseKey);
+    }
   } catch (e) {
-    console.error("Supabase initialization failed:", e);
+    console.error("Supabase initialization failed (invalid URL):", e);
   }
 }
 
@@ -27,45 +33,109 @@ const PORT = 3000;
 
 app.use(express.json());
 
+// Media API Endpoint
+app.get("/api/media/:filename", (req, res) => {
+  const { filename } = req.params;
+  // Look in public/media
+  const filePath = path.join(process.cwd(), "public", "media", filename);
+
+  if (fs.existsSync(filePath)) {
+    const contentType = mime.lookup(filePath) || "application/octet-stream";
+    res.setHeader("Content-Type", contentType);
+    // Cache for 1 year
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    fs.createReadStream(filePath).pipe(res);
+  } else {
+    console.error(`Media not found: ${filePath}`);
+    res.status(404).json({ error: "Media file not found" });
+  }
+});
+
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", supabase: !!supabase });
 });
 
 // API Routes
+const MOCK_PERFUMES = [
+  { id: 1, name: "Creed Aventus (Mock)", price: "₦18,000", priceValue: 18000, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop", inStock: 1 },
+  { id: 2, name: "Sauvage Elixir (Mock)", price: "₦22,000", priceValue: 22000, image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop", inStock: 1 }
+];
+
+const MOCK_PORTFOLIO = [
+  { id: 1, title: "Wedding Highlight (Mock)", image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=400&fit=crop", description: "Mock description for preview.", works: [] }
+];
+
 app.get("/api/perfumes", async (req, res) => {
   if (!supabase) {
-    return res.json([
-      { id: 1, name: "Creed Aventus (Mock)", price: "₦18,000", priceValue: 18000, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop", inStock: 1 },
-      { id: 2, name: "Sauvage Elixir (Mock)", price: "₦22,000", priceValue: 22000, image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&h=400&fit=crop", inStock: 1 }
-    ]);
+    return res.json(MOCK_PERFUMES);
   }
-  const { data, error } = await supabase.from("perfumes").select("*");
-  if (error) {
-    console.error("Supabase Error (perfumes):", error);
-    return res.status(500).json({ error: error.message, code: error.code });
+  try {
+    const { data, error } = await supabase.from("perfumes").select("*");
+    if (error) {
+      console.error("Supabase Error (perfumes):", error);
+      // Fallback to mock if table is missing or fetch failed
+      if (
+        error.code === 'PGRST116' || 
+        error.message?.includes('relation "perfumes" does not exist') ||
+        error.message?.includes('fetch failed')
+      ) {
+        return res.json(MOCK_PERFUMES);
+      }
+      return res.status(500).json({ error: error.message, code: error.code });
+    }
+    res.json(data || MOCK_PERFUMES);
+  } catch (err: any) {
+    console.error("Unexpected Error (perfumes):", err);
+    // If it's a fetch error, fall back to mock
+    if (err.message?.includes('fetch failed')) {
+      return res.json(MOCK_PERFUMES);
+    }
+    res.json(MOCK_PERFUMES);
   }
-  res.json(data);
 });
 
 app.get("/api/portfolio", async (req, res) => {
   if (!supabase) {
-    return res.json([
-      { id: 1, title: "Wedding Highlight (Mock)", image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&h=400&fit=crop", description: "Mock description for preview.", works: [] }
-    ]);
+    return res.json(MOCK_PORTFOLIO);
   }
-  const { data: portfolio, error: portError } = await supabase.from("portfolio").select("*");
-  if (portError) {
-    console.error("Supabase Error (portfolio):", portError);
-    return res.status(500).json({ error: portError.message, code: portError.code });
+  try {
+    const { data: portfolio, error: portError } = await supabase.from("portfolio").select("*");
+    if (portError) {
+      console.error("Supabase Error (portfolio):", portError);
+      // Fallback to mock if table is missing or fetch failed
+      if (
+        portError.code === 'PGRST116' || 
+        portError.message?.includes('relation "portfolio" does not exist') ||
+        portError.message?.includes('fetch failed')
+      ) {
+        return res.json(MOCK_PORTFOLIO);
+      }
+      return res.status(500).json({ error: portError.message, code: portError.code });
+    }
+
+    if (!portfolio || portfolio.length === 0) {
+      return res.json(MOCK_PORTFOLIO);
+    }
+
+    const portfolioWithWorks = await Promise.all(portfolio.map(async (p: any) => {
+      try {
+        const { data: works, error: worksError } = await supabase.from("portfolio_works").select("*").eq("portfolio_id", p.id);
+        return { ...p, works: works || [] };
+      } catch (e) {
+        return { ...p, works: [] };
+      }
+    }));
+
+    res.json(portfolioWithWorks);
+  } catch (err: any) {
+    console.error("Unexpected Error (portfolio):", err);
+    // If it's a fetch error, fall back to mock
+    if (err.message?.includes('fetch failed')) {
+      return res.json(MOCK_PORTFOLIO);
+    }
+    res.json(MOCK_PORTFOLIO);
   }
-
-  const portfolioWithWorks = await Promise.all(portfolio.map(async (p: any) => {
-    const { data: works, error: worksError } = await supabase.from("portfolio_works").select("*").eq("portfolio_id", p.id);
-    return { ...p, works: works || [] };
-  }));
-
-  res.json(portfolioWithWorks);
 });
 
 app.post("/api/messages", async (req, res) => {
@@ -122,11 +192,24 @@ app.get("/api/admin/data", async (req, res) => {
   if (!supabase) {
     return res.json({ messages: [], orders: [] });
   }
-  const { data: messages, error: msgError } = await supabase.from("messages").select("*").order("createdAt", { ascending: false });
-  const { data: orders, error: ordError } = await supabase.from("orders").select("*").order("createdAt", { ascending: false });
-  
-  if (msgError || ordError) return res.status(500).json({ error: msgError?.message || ordError?.message });
-  res.json({ messages, orders });
+  try {
+    const { data: messages, error: msgError } = await supabase.from("messages").select("*").order("createdAt", { ascending: false });
+    const { data: orders, error: ordError } = await supabase.from("orders").select("*").order("createdAt", { ascending: false });
+    
+    if (msgError || ordError) {
+      const err = msgError || ordError;
+      console.error("Supabase Admin Data Error:", err);
+      // If fetch failed or table missing, return empty lists instead of 500
+      if (err?.message?.includes('fetch failed') || err?.message?.includes('does not exist')) {
+        return res.json({ messages: [], orders: [] });
+      }
+      return res.status(500).json({ error: err?.message });
+    }
+    res.json({ messages: messages || [], orders: orders || [] });
+  } catch (err: any) {
+    console.error("Unexpected Admin Data Error:", err);
+    res.json({ messages: [], orders: [] });
+  }
 });
 
 app.put("/api/admin/perfumes/:id", async (req, res) => {
