@@ -21,11 +21,19 @@ if (supabaseUrl && supabaseKey) {
     // Basic URL validation
     const url = new URL(supabaseUrl);
     if (url.protocol.startsWith('http')) {
+      // Check if it looks like a valid Supabase URL
+      if (!url.hostname.endsWith('.supabase.co') && !url.hostname.includes('localhost') && !url.hostname.includes('127.0.0.1')) {
+        console.warn("⚠️ Warning: SUPABASE_URL does not look like a standard Supabase URL (usually ends in .supabase.co). Current host:", url.hostname);
+      }
       supabase = createClient(supabaseUrl, supabaseKey);
+    } else {
+      console.error("❌ Supabase initialization failed: URL must start with http or https");
     }
   } catch (e) {
-    console.error("Supabase initialization failed (invalid URL):", e);
+    console.error("❌ Supabase initialization failed: Invalid SUPABASE_URL provided. It should be a full URL like https://xyz.supabase.co");
   }
+} else if (process.env.NODE_ENV === 'production') {
+  console.warn("⚠️ Warning: Supabase credentials are not configured. Using mock data fallback.");
 }
 
 const app = express();
@@ -74,23 +82,12 @@ app.get("/api/perfumes", async (req, res) => {
     const { data, error } = await supabase.from("perfumes").select("*");
     if (error) {
       console.error("Supabase Error (perfumes):", error);
-      // Fallback to mock if table is missing or fetch failed
-      if (
-        error.code === 'PGRST116' || 
-        error.message?.includes('relation "perfumes" does not exist') ||
-        error.message?.includes('fetch failed')
-      ) {
-        return res.json(MOCK_PERFUMES);
-      }
-      return res.status(500).json({ error: error.message, code: error.code });
+      // Always fall back to mock data on error for GET requests
+      return res.json(MOCK_PERFUMES);
     }
     res.json(data || MOCK_PERFUMES);
   } catch (err: any) {
     console.error("Unexpected Error (perfumes):", err);
-    // If it's a fetch error, fall back to mock
-    if (err.message?.includes('fetch failed')) {
-      return res.json(MOCK_PERFUMES);
-    }
     res.json(MOCK_PERFUMES);
   }
 });
@@ -103,15 +100,8 @@ app.get("/api/portfolio", async (req, res) => {
     const { data: portfolio, error: portError } = await supabase.from("portfolio").select("*");
     if (portError) {
       console.error("Supabase Error (portfolio):", portError);
-      // Fallback to mock if table is missing or fetch failed
-      if (
-        portError.code === 'PGRST116' || 
-        portError.message?.includes('relation "portfolio" does not exist') ||
-        portError.message?.includes('fetch failed')
-      ) {
-        return res.json(MOCK_PORTFOLIO);
-      }
-      return res.status(500).json({ error: portError.message, code: portError.code });
+      // Always fall back to mock data on error for GET requests
+      return res.json(MOCK_PORTFOLIO);
     }
 
     if (!portfolio || portfolio.length === 0) {
@@ -130,10 +120,6 @@ app.get("/api/portfolio", async (req, res) => {
     res.json(portfolioWithWorks);
   } catch (err: any) {
     console.error("Unexpected Error (portfolio):", err);
-    // If it's a fetch error, fall back to mock
-    if (err.message?.includes('fetch failed')) {
-      return res.json(MOCK_PORTFOLIO);
-    }
     res.json(MOCK_PORTFOLIO);
   }
 });
