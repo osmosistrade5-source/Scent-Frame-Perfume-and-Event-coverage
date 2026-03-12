@@ -24,6 +24,7 @@ if (supabaseUrl && supabaseKey) {
       // Check if it looks like a valid Supabase URL
       if (!url.hostname.endsWith('.supabase.co') && !url.hostname.includes('localhost') && !url.hostname.includes('127.0.0.1')) {
         console.warn("⚠️ Warning: SUPABASE_URL does not look like a standard Supabase URL (usually ends in .supabase.co). Current host:", url.hostname);
+        console.warn("👉 Please check your SUPABASE_URL secret in Settings > Secrets. It should be a full URL like https://xyz.supabase.co");
       }
       supabase = createClient(supabaseUrl, supabaseKey);
     } else {
@@ -81,13 +82,17 @@ app.get("/api/perfumes", async (req, res) => {
   try {
     const { data, error } = await supabase.from("perfumes").select("*");
     if (error) {
-      console.error("Supabase Error (perfumes):", error);
-      // Always fall back to mock data on error for GET requests
+      // Only log if it's not a common fetch failure to reduce noise
+      if (!error.message?.includes('fetch failed')) {
+        console.error("Supabase Error (perfumes):", error);
+      }
       return res.json(MOCK_PERFUMES);
     }
     res.json(data || MOCK_PERFUMES);
   } catch (err: any) {
-    console.error("Unexpected Error (perfumes):", err);
+    if (!err.message?.includes('fetch failed')) {
+      console.error("Unexpected Error (perfumes):", err);
+    }
     res.json(MOCK_PERFUMES);
   }
 });
@@ -99,8 +104,9 @@ app.get("/api/portfolio", async (req, res) => {
   try {
     const { data: portfolio, error: portError } = await supabase.from("portfolio").select("*");
     if (portError) {
-      console.error("Supabase Error (portfolio):", portError);
-      // Always fall back to mock data on error for GET requests
+      if (!portError.message?.includes('fetch failed')) {
+        console.error("Supabase Error (portfolio):", portError);
+      }
       return res.json(MOCK_PORTFOLIO);
     }
 
@@ -184,7 +190,10 @@ app.get("/api/admin/data", async (req, res) => {
     
     if (msgError || ordError) {
       const err = msgError || ordError;
-      console.error("Supabase Admin Data Error:", err);
+      // Only log if it's not a common fetch failure
+      if (!err?.message?.includes('fetch failed')) {
+        console.error("Supabase Admin Data Error:", err);
+      }
       // If fetch failed or table missing, return empty lists instead of 500
       if (err?.message?.includes('fetch failed') || err?.message?.includes('does not exist')) {
         return res.json({ messages: [], orders: [] });
@@ -193,7 +202,9 @@ app.get("/api/admin/data", async (req, res) => {
     }
     res.json({ messages: messages || [], orders: orders || [] });
   } catch (err: any) {
-    console.error("Unexpected Admin Data Error:", err);
+    if (!err.message?.includes('fetch failed')) {
+      console.error("Unexpected Admin Data Error:", err);
+    }
     res.json({ messages: [], orders: [] });
   }
 });
