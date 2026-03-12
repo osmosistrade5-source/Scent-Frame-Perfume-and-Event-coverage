@@ -17,21 +17,45 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 let supabase: any = null;
 if (supabaseUrl && supabaseKey) {
-  try {
-    // Basic URL validation
-    const url = new URL(supabaseUrl);
-    if (url.protocol.startsWith('http')) {
-      // Check if it looks like a valid Supabase URL
-      if (!url.hostname.endsWith('.supabase.co') && !url.hostname.includes('localhost') && !url.hostname.includes('127.0.0.1')) {
-        console.warn("⚠️ Warning: SUPABASE_URL does not look like a standard Supabase URL (usually ends in .supabase.co). Current host:", url.hostname);
-        console.warn("👉 Please check your SUPABASE_URL secret in Settings > Secrets. It should be a full URL like https://xyz.supabase.co");
-      }
-      supabase = createClient(supabaseUrl, supabaseKey);
+  let finalUrl = supabaseUrl.trim();
+  let finalKey = supabaseKey.trim();
+
+  // 1. Detect if URL and Key were swapped
+  const isUrlLike = (s: string) => s.startsWith('http') || s.includes('.supabase.co');
+  const isKeyLike = (s: string) => s.length > 50 || s.includes('eyJ'); // JWTs are long and start with eyJ
+
+  if (isKeyLike(finalUrl) && isUrlLike(finalKey)) {
+    console.warn("⚠️ Potential Configuration Error: It looks like SUPABASE_URL and SUPABASE_ANON_KEY might be swapped in your Secrets.");
+    [finalUrl, finalKey] = [finalKey, finalUrl]; // Try swapping them back
+  }
+
+  // 2. Try to fix common URL mistakes
+  if (!finalUrl.startsWith('http')) {
+    if (finalUrl.includes('.supabase.co')) {
+      finalUrl = `https://${finalUrl}`;
+    } else if (/^[a-z0-9]{15,30}$/i.test(finalUrl)) {
+      // Looks like a project ref (usually ~20 chars alphanumeric)
+      const ref = finalUrl;
+      finalUrl = `https://${ref}.supabase.co`;
+      console.info(`ℹ️ Interpreting SUPABASE_URL "${ref}" as project reference: ${finalUrl}`);
     } else {
-      console.error("❌ Supabase initialization failed: URL must start with http or https");
+      finalUrl = `https://${finalUrl}`;
+    }
+  }
+
+  try {
+    const url = new URL(finalUrl);
+    if (url.protocol.startsWith('http')) {
+      if (!url.hostname.endsWith('.supabase.co') && !url.hostname.includes('localhost') && !url.hostname.includes('127.0.0.1')) {
+        console.warn("⚠️ Warning: SUPABASE_URL host does not end in .supabase.co:", url.hostname);
+      }
+      supabase = createClient(finalUrl, finalKey);
+    } else {
+      console.error("❌ Supabase initialization failed: URL protocol must be http or https");
     }
   } catch (e) {
-    console.error("❌ Supabase initialization failed: Invalid SUPABASE_URL provided. It should be a full URL like https://xyz.supabase.co");
+    console.error("❌ Supabase initialization failed: The provided SUPABASE_URL is not a valid web address.");
+    console.error("👉 Please check Settings > Secrets. It should be a full URL like https://xyz.supabase.co");
   }
 } else if (process.env.NODE_ENV === 'production') {
   console.warn("⚠️ Warning: Supabase credentials are not configured. Using mock data fallback.");
